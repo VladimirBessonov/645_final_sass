@@ -1,5 +1,7 @@
 // INCLUDE GULP
-var gulp = require('gulp'); 
+var {src, dest, watch, series } = require('gulp')
+
+const gulp = require("gulp")
  
 // INCLUDE GULP PLUGINS
 var jshint = require('gulp-jshint'),
@@ -10,51 +12,72 @@ var jshint = require('gulp-jshint'),
     minifyHTML = require('gulp-minify-html'),
     autoprefixer = require('gulp-autoprefixer');
 
-// GULP TASK AUTOMATOR
-gulp.task('default', ['jshint', 
-                      'uglify', 
-                      'uglifycss', 
-                      'minifyimages', 
-                      'minifyhtml']);
+var sass = require('gulp-sass')
+sass.compiler = require('node-sass')
 
-// TASK: JS HINT
-gulp.task('jshint', function() {
-    gulp.src('./js/*.js')
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'));
-});
+// 0. TASK: SCSS COMPILER
+function css () {
+    return src('css/base.scss')
+            .pipe(sass())
+         .pipe(dest('dist/css'))
+}
 
-// TASK: MINIFY JS
-gulp.task('uglify', function() {
-    return gulp.src('./js/*.js')
+// 1. TASK: JS HINT
+
+function  doJshint () {
+        return src('./js/*.js')
+            .pipe(jshint())
+            .pipe(jshint.reporter('default'))
+}
+
+// 2. TASK: MINIFY JS
+
+function doUglify () {
+
+    return  src('./js/*.js')
         .pipe(uglify())
-        .pipe(gulp.dest('./dist/js'));
-});
+        .pipe(dest('./dist/js'));
 
-// TASK: MINIFY CSS
-gulp.task('uglifycss', function () {
-    gulp.src('./css/*.css')
+}
+
+// 3 TASK: MINIFY CSS
+
+    function doUglifycss () {
+    return src('./css/*.css')
         .pipe(autoprefixer('last 2 versions'))
         .pipe(uglifycss({maxLineLen: 80}))
-        .pipe(gulp.dest('./dist/css'));
-});
+        .pipe(dest('./dist/css'));
+}
 
-// TASK: MINIFY HTML
-gulp.task('minifyimages', function() {
+// 4 TASK: MINIFY HTML
+function minifyimages () {
     var imgSrc = './images/**/*',
         imgDst = './dist/images';
-    gulp.src(imgSrc)
+    return src(imgSrc)
         .pipe(changed(imgDst))
         .pipe(imagemin())
-        .pipe(gulp.dest(imgDst));
-});
+        .pipe(dest(imgDst));
+}
 
-// TASK: MINIFY HTML
-gulp.task('minifyhtml', function() {
+// 5 TASK: MINIFY HTML
+function minifyhtml () {
     var htmlSrc = './*.html',
         htmlDst = './dist';
-    gulp.src(htmlSrc)
+    return src(htmlSrc)
         .pipe(changed(htmlDst))
         .pipe(minifyHTML())
-        .pipe(gulp.dest(htmlDst));
-});
+        .pipe(dest(htmlDst));
+}
+
+// GULP TASK AUTOMATOR
+exports.css = css;
+exports.doJshint = doJshint;
+exports.doUglify = doUglify;
+exports.doUglifycss = doUglifycss;
+exports.minifyimages = minifyimages;
+exports.minifyhtml = minifyhtml;
+
+exports.default = series(css, doJshint, doUglify, doUglifycss, minifyimages, minifyhtml);
+exports.watch = function () {
+    watch('src/*.scss', css)
+}
