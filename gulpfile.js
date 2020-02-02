@@ -1,5 +1,7 @@
 // INCLUDE GULP
 var {src, dest, watch, series } = require('gulp')
+var sass = require('gulp-sass')
+sass.compiler = require('node-sass')
 
 const gulp = require("gulp")
  
@@ -10,14 +12,53 @@ var jshint = require('gulp-jshint'),
     changed = require('gulp-changed'),
     imagemin = require('gulp-imagemin'),
     minifyHTML = require('gulp-minify-html'),
-    autoprefixer = require('gulp-autoprefixer');
+    autoprefixer = require('gulp-autoprefixer'),
+    concat = require('gulp-concat'),
+    rename = require('gulp-rename'),
+    sourcemaps = require('gulp-sourcemaps'),
+     concatCss = require('gulp-concat-css');
 
 var sass = require('gulp-sass')
 sass.compiler = require('node-sass')
 
+
+// Concat JS
+
+var jsFiles = './js/**/*.js',
+    jsDest = './scripts';
+
+function doConcatjs (done) {
+    src(jsFiles)
+        .pipe(sourcemaps.init())
+        .pipe(concat('scripts.js'))
+        // .pipe(dest(jsDest))
+        .pipe(rename('scripts.min.js'))
+        .pipe(uglify())
+        .pipe(sourcemaps.write())
+        .pipe(dest(jsDest));
+    done()
+}
+// Concat CSS
+
+var cssFiles = './css/**/*.css',
+    cssDest = './styles' ;
+
+function doConcatcss (done) {
+    src(cssFiles)
+        .pipe(sourcemaps.init())
+        .pipe(concatCss('styles.js'))
+        // .pipe(dest(jsDest))
+        .pipe(rename('styles.min.js'))
+        .pipe(uglifycss())
+        .pipe(sourcemaps.write())
+        .pipe(dest(cssDest));
+    done()
+}
+
+
 // 0. TASK: SCSS COMPILER
 function css () {
-    return src('css/base.scss')
+    return src('./css/*.css')
             .pipe(sass())
          .pipe(dest('dist/css'))
 }
@@ -70,7 +111,9 @@ function minifyhtml () {
 }
 
 // GULP TASK AUTOMATOR
-exports.css = css;
+// exports.css = css;
+exports.doConcatjs = doConcatjs
+exports.doConcatcss = doConcatcss
 exports.doJshint = doJshint;
 exports.doUglify = doUglify;
 exports.doUglifycss = doUglifycss;
@@ -78,6 +121,6 @@ exports.minifyimages = minifyimages;
 exports.minifyhtml = minifyhtml;
 
 exports.default = series(css, doJshint, doUglify, doUglifycss, minifyimages, minifyhtml);
-exports.watch = function () {
-    watch('src/*.scss', css)
-}
+// exports.watch = function () {
+//     watch('src/*.scss', css)
+// }

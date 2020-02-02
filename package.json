@@ -11,11 +11,15 @@
     "gulp-jshint": "^2.1.0",
     "gulp-minify-html": "^1.0.6",
     "gulp-sass": "^4.0.2",
-    "gulp-uglify": "^3.0.2",
     "gulp-uglifycss": "^1.1.0",
     "node-sass": "^4.13.1"
   },
   "devDependencies": {
+    "gulp-concat": "^2.6.1",
+    "gulp-concat-css": "^3.1.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-uglify": "^3.0.2",
     "jshint": "^2.11.0"
   },
   "scripts": {
