@@ -1,5 +1,7 @@
 (function($){
-	
+
+
+
 	//plugin's default options
 	var settings = {
 		combine: true,					//combine multiple menus into a single select

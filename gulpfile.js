@@ -22,10 +22,18 @@ var sass = require('gulp-sass')
 sass.compiler = require('node-sass')
 
 
-// Concat JS
+// 1. TASK: SCSS COMPILER
+function css () {
+    return src('./css/*.scss')
+        .pipe(sass())
+        .pipe(rename('style.css'))
+        .pipe(dest('./css'))
+}
+
+// 2. Concat JS
 
 var jsFiles = './js/**/*.js',
-    jsDest = './scripts';
+    jsDest = './dist/js';
 
 function doConcatjs (done) {
     src(jsFiles)
@@ -36,34 +44,28 @@ function doConcatjs (done) {
         .pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(dest(jsDest));
-    done()
+        done()
 }
-// Concat CSS
+// 3. Concat CSS
 
-var cssFiles = './css/**/*.css',
-    cssDest = './styles' ;
+var cssFiles = './css/*.css',
+    cssDest = './dist/css' ;
 
 function doConcatcss (done) {
+
     src(cssFiles)
         .pipe(sourcemaps.init())
         .pipe(concatCss('styles.js'))
         // .pipe(dest(jsDest))
-        .pipe(rename('styles.min.js'))
+        .pipe(rename('styles.min.css'))
         .pipe(uglifycss())
         .pipe(sourcemaps.write())
         .pipe(dest(cssDest));
-    done()
+        done()
 }
 
 
-// 0. TASK: SCSS COMPILER
-function css () {
-    return src('./css/*.css')
-            .pipe(sass())
-         .pipe(dest('dist/css'))
-}
-
-// 1. TASK: JS HINT
+// 4. TASK: JS HINT
 
 function  doJshint () {
         return src('./js/*.js')
@@ -71,7 +73,7 @@ function  doJshint () {
             .pipe(jshint.reporter('default'))
 }
 
-// 2. TASK: MINIFY JS
+// 5. TASK: MINIFY JS
 
 function doUglify () {
 
@@ -81,7 +83,7 @@ function doUglify () {
 
 }
 
-// 3 TASK: MINIFY CSS
+// 6. TASK: MINIFY CSS
 
     function doUglifycss () {
     return src('./css/*.css')
@@ -90,7 +92,7 @@ function doUglify () {
         .pipe(dest('./dist/css'));
 }
 
-// 4 TASK: MINIFY HTML
+// 7. TASK: MINIFY HTML
 function minifyimages () {
     var imgSrc = './images/**/*',
         imgDst = './dist/images';
@@ -100,7 +102,7 @@ function minifyimages () {
         .pipe(dest(imgDst));
 }
 
-// 5 TASK: MINIFY HTML
+// 8. TASK: MINIFY HTML
 function minifyhtml () {
     var htmlSrc = './*.html',
         htmlDst = './dist';
@@ -111,7 +113,7 @@ function minifyhtml () {
 }
 
 // GULP TASK AUTOMATOR
-// exports.css = css;
+exports.css = css;
 exports.doConcatjs = doConcatjs
 exports.doConcatcss = doConcatcss
 exports.doJshint = doJshint;
@@ -120,7 +122,20 @@ exports.doUglifycss = doUglifycss;
 exports.minifyimages = minifyimages;
 exports.minifyhtml = minifyhtml;
 
-exports.default = series(css, doJshint, doUglify, doUglifycss, minifyimages, minifyhtml);
-// exports.watch = function () {
-//     watch('src/*.scss', css)
-// }
+exports.default = series(css, doConcatjs, doConcatcss, doJshint, doUglify, doUglifycss, minifyimages, minifyhtml);
+
+exports.watch = function () {
+    watch('./css/*.*css', function(done) {
+            css()
+            doConcatcss()
+            done()
+        }
+        )
+    watch('index.html', minifyhtml)
+    watch('./js/*.js', function(done) {
+            doConcatjs()
+            doUglify()
+        done();
+        }
+    )
+}
