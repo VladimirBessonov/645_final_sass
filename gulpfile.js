@@ -1,9 +1,11 @@
 // INCLUDE GULP
-var {src, dest, watch, series } = require('gulp')
+var {src, dest, watch, series, parallel } = require('gulp')
 var sass = require('gulp-sass')
 sass.compiler = require('node-sass')
 
-const gulp = require("gulp")
+// ONLINE RELOAD
+var browserSync = require('browser-sync').create();
+
  
 // INCLUDE GULP PLUGINS
 var jshint = require('gulp-jshint'),
@@ -20,6 +22,16 @@ var jshint = require('gulp-jshint'),
 
 var sass = require('gulp-sass')
 sass.compiler = require('node-sass')
+
+// 0. ONLINE RELOAD
+
+function browsersync() {
+    browserSync.init({
+        server: {
+            baseDir: 'dist'
+        },
+    })
+}
 
 
 // 1. TASK: SCSS COMPILER
@@ -42,7 +54,7 @@ function doConcatjs (done) {
         // .pipe(dest(jsDest))
         .pipe(rename('scripts.min.js'))
         .pipe(uglify())
-        .pipe(sourcemaps.write())
+        .pipe(sourcemaps.write('.'))
         .pipe(dest(jsDest));
         done()
 }
@@ -59,7 +71,7 @@ function doConcatcss (done) {
         // .pipe(dest(jsDest))
         .pipe(rename('styles.min.css'))
         .pipe(uglifycss())
-        .pipe(sourcemaps.write())
+        .pipe(sourcemaps.write('.'))
         .pipe(dest(cssDest));
         done()
 }
@@ -112,7 +124,17 @@ function minifyhtml () {
         .pipe(dest(htmlDst));
 }
 
+
+function watcher (done) {
+    watch(['./css/*.*css', 'index.html','./js/*.js' ],
+         series(css, doConcatcss, doConcatjs, doUglify, minifyhtml )
+
+    )
+   done()
+}
+
 // GULP TASK AUTOMATOR
+exports.browsersync = browsersync
 exports.css = css;
 exports.doConcatjs = doConcatjs
 exports.doConcatcss = doConcatcss
@@ -122,20 +144,6 @@ exports.doUglifycss = doUglifycss;
 exports.minifyimages = minifyimages;
 exports.minifyhtml = minifyhtml;
 
-exports.default = series(css, doConcatjs, doConcatcss, doJshint, doUglify, doUglifycss, minifyimages, minifyhtml);
+exports.default = series(css, doConcatjs, doConcatcss, doJshint,  minifyimages, minifyhtml ); // doUglify, doUglifycss,
 
-exports.watch = function () {
-    watch('./css/*.*css', function(done) {
-            css()
-            doConcatcss()
-            done()
-        }
-        )
-    watch('index.html', minifyhtml)
-    watch('./js/*.js', function(done) {
-            doConcatjs()
-            doUglify()
-        done();
-        }
-    )
-}
+exports.watch = watcher
