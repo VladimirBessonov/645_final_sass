@@ -30,7 +30,13 @@ function browsersync() {
         server: {
             baseDir: 'dist'
         },
-    })
+    });
+    watch(['./css/*.*css', 'index.html','./js/*.js' ],
+        series(css, doConcatcss, doConcatjs, doUglify, minifyhtml )
+
+    ).on('change', browserSync.reload)
+
+
 }
 
 
@@ -134,7 +140,7 @@ function watcher (done) {
 }
 
 // GULP TASK AUTOMATOR
-exports.browsersync = browsersync
+exports.browsersync = browsersync // can use browsersync to inject changes and reload the page or gulp watch.
 exports.css = css;
 exports.doConcatjs = doConcatjs
 exports.doConcatcss = doConcatcss
@@ -144,6 +150,8 @@ exports.doUglifycss = doUglifycss;
 exports.minifyimages = minifyimages;
 exports.minifyhtml = minifyhtml;
 
-exports.default = series(css, doConcatjs, doConcatcss, doJshint,  minifyimages, minifyhtml ); // doUglify, doUglifycss,
+exports.default = series(css, doConcatjs, doConcatcss, doJshint,  minifyimages, minifyhtml, watcher ); // doUglify, doUglifycss,
+
+
 
 exports.watch = watcher

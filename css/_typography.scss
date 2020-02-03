@@ -25,7 +25,10 @@ h1, h2, h3, h4, h5, h6 {
   font-family: $font-header, "Times New Roman", serif;
   font-weight: $font-header-weight; }
 
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit; }
+h1 , h2 , h3 , h4 , h5 , h6 {
+  a { font-weight: inherit; }
+}
+
 h1 { font-size: 46px; line-height: 50px; margin-bottom: 14px;}
 h2 { font-size: 35px; line-height: 40px; margin-bottom: 10px; }
 h3 { font-size: 28px; line-height: 34px; margin-bottom: 8px; }
@@ -49,7 +52,7 @@ small { font-size: 80%; }
 /*	Blockquotes  */
 blockquote, blockquote p { font-size: 17px; line-height: 24px; color: $quotegrey; font-style: italic; }
 blockquote { margin: 0 0 20px; padding: 9px 20px 0 19px; border-left: 1px solid $quoteborder; }
-blockquote cite { display: block; font-size: 12px; color: #555; }
+blockquote cite { display: block; font-size: 12px; color: $quotecite; }
 blockquote cite:before { content: "\2014 \0020"; }
 blockquote cite a, blockquote cite a:visited, blockquote cite a:visited { color: $quotecite; }
 
@@ -72,10 +75,8 @@ ol, ul.square, ul.circle, ul.disc { margin-left: 30px; }
 ul.square { list-style: square outside; }
 ul.circle { list-style: circle outside; }
 ul.disc { list-style: disc outside; }
-ul ul, ul ol,
-ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 90%;  }
-ul ul li, ul ol li,
-ol ol li, ol ul li { margin-bottom: 6px; }
+ul ul, ul ol, ol ol, ol ul { margin: 4px 0 5px 30px; font-size: 90%;  }
+ul ul li, ul ol li, ol ol li, ol ul li { margin-bottom: 6px; }
 li { line-height: 18px; margin-bottom: 12px; }
 ul.large li { line-height: 21px; }
 li p { line-height: 21px; }
